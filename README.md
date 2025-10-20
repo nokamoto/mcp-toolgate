@@ -37,16 +37,9 @@ This configuration demonstrates how to run an MCP server through `mcp-toolgate` 
 
 ### Behavior
 
-When used as shown above, `mcp-toolgate` acts as a proxy that intercepts the MCP server’s tool registration and filters it based on environment variables.
+When used as shown above, `mcp-toolgate` acts as a proxy that intercepts the MCP server’s tool registration and filters it based on environment variables.  
+It reads from stdin and writes to stdout, making it easy to insert into an existing pipeline (e.g., `mcp-server | mcp-toolgate`) without modifying the original MCP server.
 
 ### Environment Variables
 - `ALLOWED_TOOL_NAMES`: Comma-separated list of tools to allow. Only these tools will be registered and exposed to clients.
 - `DEBUG`: Enables debug logging when set (even to an empty string). Useful for troubleshooting.
-
-### Notes
-
-- `mcp-toolgate` reads from stdin and writes to stdout, making it easy to insert into an existing pipeline:
-    ```
-    mcp-server | mcp-toolgate
-    ```
-- Intended for simple, configuration-driven filtering of tools without modifying the original MCP server.
