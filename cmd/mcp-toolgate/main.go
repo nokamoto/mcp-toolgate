@@ -50,6 +50,5 @@ func main() {
 			logger.Error("Error reading from stdin", "error", err)
 			os.Exit(1)
 		}
-		return
 	}
 }
