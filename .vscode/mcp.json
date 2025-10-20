@@ -1,0 +1,15 @@
+{
+    "servers": {
+        "github": {
+            "command": "bash",
+            "args": [
+                "-lc",
+                "docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server | go run ./cmd/mcp-toolgate"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_TOKEN}",
+                "DEBUG": ""
+            }
+        }
+    }
+}
