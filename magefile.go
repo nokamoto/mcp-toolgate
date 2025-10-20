@@ -42,6 +42,7 @@ func Test() error {
 	if err := g0("test", "./..."); err != nil {
 		return fmt.Errorf("tests failed: %w", err)
 	}
+	return nil
 }
 
 // Tidy tidies the go.mod file.
