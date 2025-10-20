@@ -58,7 +58,6 @@ func (a *allowedToolGate) replaceResult(result json.RawMessage) (json.RawMessage
 	if !ok {
 		return result, nil
 	}
-	slog.Info("Tools before filtering", "tools", len(tools))
 
 	tools, err := a.replaceTools(tools)
 	if err != nil {
@@ -78,6 +77,8 @@ func (a *allowedToolGate) replaceTools(tools json.RawMessage) (json.RawMessage, 
 	if err := json.Unmarshal(tools, &toolList); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal tools: %w", err)
 	}
+
+	slog.Info("Original tool count", "count", len(toolList))
 
 	var filtered []map[string]json.RawMessage
 	for _, tool := range toolList {
