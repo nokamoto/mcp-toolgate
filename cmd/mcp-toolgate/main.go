@@ -7,7 +7,19 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
+
+	"github.com/nokamoto/mcp-toolgate/internal/jsonrpc"
+)
+
+type replacer interface {
+	Replace(input string) (string, error)
+}
+
+const (
+	debug            = "DEBUG"
+	allowedToolNames = "ALLOWED_TOOL_NAMES"
 )
 
 func main() {
@@ -23,17 +35,25 @@ func main() {
 
 	var logger *slog.Logger
 	var opts slog.HandlerOptions
-	if os.Getenv("DEBUG") != "" {
+	if os.Getenv(debug) != "" {
 		opts.Level = slog.LevelDebug
 	}
 	logger = slog.New(slog.NewTextHandler(os.Stderr, &opts))
 
 	logger.Info("Starting mcp-toolgate...")
 
+	var replacer replacer
+	replacer = jsonrpc.NewAllowedToolGate(strings.Split(os.Getenv(allowedToolNames), ","))
+
 	go func() {
 		for scanner.Scan() {
 			line := scanner.Text()
-			fmt.Println(line)
+			replaced, err := replacer.Replace(line)
+			if err != nil {
+				errorChan <- fmt.Errorf("failed to replace line: %w", err)
+				return
+			}
+			fmt.Println(replaced)
 			logger.Debug("stdin content", "line", line)
 		}
 		if err := scanner.Err(); err != nil {
@@ -47,7 +67,7 @@ func main() {
 		logger.Info("Shutting down mcp-toolgate...")
 	case err := <-errorChan:
 		if err != nil {
-			logger.Error("Error reading from stdin", "error", err)
+			logger.Error("Error occurred", "error", err)
 			os.Exit(1)
 		}
 	}
