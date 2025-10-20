@@ -38,11 +38,16 @@ func Format() error {
 }
 
 // Test runs the tests in the project.
-func Test() {
-	g0("test", "./...")
+func Test() error {
+	if err := g0("test", "./..."); err != nil {
+		return fmt.Errorf("tests failed: %w", err)
+	}
 }
 
 // Tidy tidies the go.mod file.
-func Tidy() {
-	g0("mod", "tidy")
+func Tidy() error {
+	if err := g0("mod", "tidy"); err != nil {
+		return fmt.Errorf("tidy failed: %w", err)
+	}
+	return nil
 }
