@@ -30,7 +30,6 @@ func main() {
 	)
 	defer stop()
 
-	scanner := bufio.NewScanner(os.Stdin)
 	errorChan := make(chan error, 1)
 
 	var logger *slog.Logger
@@ -46,8 +45,17 @@ func main() {
 	replacer = jsonrpc.NewAllowedToolGate(strings.Split(os.Getenv(allowedToolNames), ","))
 
 	go func() {
-		for scanner.Scan() {
-			line := scanner.Text()
+		reader := bufio.NewReader(os.Stdin)
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				if err.Error() == "EOF" {
+					break
+				}
+				errorChan <- fmt.Errorf("failed to read line: %w", err)
+				return
+			}
+			line = strings.TrimSuffix(line, "\n")
 			replaced, err := replacer.Replace(line)
 			if err != nil {
 				errorChan <- fmt.Errorf("failed to replace line: %w", err)
@@ -55,9 +63,6 @@ func main() {
 			}
 			fmt.Println(replaced)
 			logger.Debug("stdin content", "line", line)
-		}
-		if err := scanner.Err(); err != nil {
-			errorChan <- err
 		}
 		close(errorChan)
 	}()
