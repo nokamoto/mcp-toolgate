@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -48,10 +49,10 @@ func main() {
 		reader := bufio.NewReader(os.Stdin)
 		for {
 			line, err := reader.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
 			if err != nil {
-				if err.Error() == "EOF" {
-					break
-				}
 				errorChan <- fmt.Errorf("failed to read line: %w", err)
 				return
 			}
