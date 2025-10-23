@@ -56,7 +56,7 @@ func main() {
 				errorChan <- fmt.Errorf("failed to read line: %w", err)
 				return
 			}
-			line = strings.TrimSuffix(line, "\n")
+			line = strings.TrimSpace(line)
 			replaced, err := replacer.Replace(line)
 			if err != nil {
 				errorChan <- fmt.Errorf("failed to replace line: %w", err)
